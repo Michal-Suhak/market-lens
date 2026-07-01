@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, StatementError
 
-from market_lens.storage import Document, Event, Price
+from market_lens.storage import Document, Event, Outcome, Prediction, Price
 
 
 def test_event_round_trip(db_session, make_event):
@@ -88,3 +88,44 @@ def test_duplicate_price_bar_rejected(db_session, make_price):
 
     with pytest.raises(IntegrityError):
         db_session.commit()
+
+
+def test_prediction_round_trip(db_session, make_prediction):
+    db_session.add(make_prediction())
+    db_session.commit()
+    db_session.expire_all()
+
+    prediction = db_session.scalars(select(Prediction)).one()
+
+    assert prediction.tone == "hawkish"
+    assert prediction.direction == "down_eurusd"
+    assert prediction.confidence == 0.84
+    assert prediction.score == 0.62
+    assert prediction.model == "gemini-2.5-flash"
+    assert prediction.event.institution == "FED"
+
+
+def test_duplicate_prediction_rejected(db_session, make_event, make_prediction):
+    event = make_event()
+    db_session.add(make_prediction(event=event))
+    db_session.commit()
+
+    db_session.add(make_prediction(event=event))
+
+    with pytest.raises(IntegrityError):
+        db_session.commit()
+
+
+def test_outcome_round_trip(db_session, make_outcome):
+    db_session.add(make_outcome(ret_24h=None, realized_direction=None))
+    db_session.commit()
+    db_session.expire_all()
+
+    outcome = db_session.scalars(select(Outcome)).one()
+
+    assert outcome.pair == "EUR/USD"
+    assert outcome.ret_1h == 0.0012
+    assert outcome.ret_4h == 0.0020
+    assert outcome.ret_24h is None
+    assert outcome.realized_direction is None
+    assert outcome.event.institution == "FED"

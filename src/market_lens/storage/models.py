@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Text, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey, Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from market_lens.storage.db import Base
 from market_lens.storage.types import UTCDateTime
@@ -55,3 +55,36 @@ class Price(Base):
     high: Mapped[float]
     low: Mapped[float]
     close: Mapped[float]
+
+
+class Prediction(Base):
+    """An LLM prediction for an event: tone, direction and confidence logged at t0."""
+
+    __tablename__ = "predictions"
+    __table_args__ = (UniqueConstraint("event_id", "model", name="uq_prediction_event_model"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    event_id: Mapped[int] = mapped_column(ForeignKey("events.id"))
+    tone: Mapped[str]
+    direction: Mapped[str]
+    confidence: Mapped[float]
+    score: Mapped[float]
+    model: Mapped[str]
+    ts_utc: Mapped[datetime] = mapped_column(UTCDateTime)  # prediction time (t0), UTC
+
+    event: Mapped[Event] = relationship()
+
+
+class Outcome(Base):
+    """Realized price moves after an event, per currency pair."""
+
+    __tablename__ = "outcomes"
+
+    event_id: Mapped[int] = mapped_column(ForeignKey("events.id"), primary_key=True)
+    pair: Mapped[str] = mapped_column(primary_key=True)
+    ret_1h: Mapped[float | None]
+    ret_4h: Mapped[float | None]
+    ret_24h: Mapped[float | None]
+    realized_direction: Mapped[str | None]
+
+    event: Mapped[Event] = relationship()
