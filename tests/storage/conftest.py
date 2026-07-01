@@ -1,30 +1,9 @@
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from datetime import datetime, timezone
 
 import pytest
-from sqlalchemy.orm import Session
 
-from market_lens.storage import (
-    Document,
-    Event,
-    Outcome,
-    Prediction,
-    Price,
-    get_sessionmaker,
-    init_db,
-)
-
-
-@pytest.fixture
-def sqlite_db_url(tmp_path) -> str:
-    return f"sqlite:///{tmp_path / 'test.db'}"
-
-
-@pytest.fixture
-def db_session(sqlite_db_url) -> Iterator[Session]:
-    init_db(sqlite_db_url)
-    with get_sessionmaker(sqlite_db_url)() as session:
-        yield session
+from market_lens.storage import Document, Event, Outcome, Prediction, Price
 
 
 @pytest.fixture
