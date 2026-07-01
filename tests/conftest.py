@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from sqlalchemy.orm import Session
 
-from market_lens.storage import Event, get_sessionmaker, init_db
+from market_lens.storage import Document, Event, Price, get_sessionmaker, init_db
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -39,5 +39,35 @@ def make_event() -> Callable[..., Event]:
             "actual": 5.5,
         }
         return Event(**{**defaults, **overrides})
+
+    return _make
+
+
+@pytest.fixture
+def make_document() -> Callable[..., Document]:
+    def _make(**overrides) -> Document:
+        defaults = {
+            "institution": "FED",
+            "doc_type": "FOMC",
+            "published_ts_utc": datetime(2026, 1, 28, 19, 0, tzinfo=timezone.utc),
+            "text": "The Committee decided to maintain the target range.",
+        }
+        return Document(**{**defaults, **overrides})
+
+    return _make
+
+
+@pytest.fixture
+def make_price() -> Callable[..., Price]:
+    def _make(**overrides) -> Price:
+        defaults = {
+            "pair": "EUR/USD",
+            "ts_utc": datetime(2026, 1, 28, 19, 0, tzinfo=timezone.utc),
+            "open": 1.0850,
+            "high": 1.0860,
+            "low": 1.0845,
+            "close": 1.0858,
+        }
+        return Price(**{**defaults, **overrides})
 
     return _make
