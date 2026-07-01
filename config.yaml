@@ -19,4 +19,3 @@ paths:
   data_dir: data
   prices_dir: data/prices
   documents_dir: data/documents
-  database: data/market_lens.db

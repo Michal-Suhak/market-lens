@@ -7,7 +7,7 @@ def test_load_config_from_yaml(sample_config_file):
     cfg = load_config(sample_config_file)
     assert cfg.pairs == ["EUR/USD", "GBP/USD"]
     assert cfg.windows_hours == [1, 4, 24]
-    assert cfg.paths.database == Path("data/market_lens.db")
+    assert cfg.paths.prices_dir == Path("data/prices")
 
 
 def test_load_config_default_path():

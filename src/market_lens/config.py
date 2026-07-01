@@ -14,10 +14,10 @@ class Paths(BaseModel):
     data_dir: Path
     prices_dir: Path
     documents_dir: Path
-    database: Path
 
 
 class Secrets(BaseSettings):
+    database_url: str = "sqlite:///data/market_lens.db"
     groq_api_key: str = ""
     gemini_api_key: str = ""
 
