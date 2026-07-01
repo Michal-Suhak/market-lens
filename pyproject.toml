@@ -32,3 +32,4 @@ target-version = ["py313"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--import-mode=importlib"
