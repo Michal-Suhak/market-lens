@@ -17,6 +17,11 @@ FOMC_ANNOUNCEMENT_ET = time(14, 0)  # statement released at 2:00 PM Eastern
 EASTERN = ZoneInfo("America/New_York")
 
 
+def fomc_announcement_utc(meeting_date: date) -> datetime:
+    """UTC instant of the FOMC statement release (2:00 PM Eastern, DST-aware)."""
+    return to_utc(datetime.combine(meeting_date, FOMC_ANNOUNCEMENT_ET), assume_tz=EASTERN)
+
+
 def compute_surprise(forecast: float | None, actual: float | None) -> float | None:
     if forecast is None or actual is None:
         return None
@@ -38,7 +43,7 @@ def build_fomc_events(
                 institution="FED",
                 event_type="FOMC",
                 currency="USD",
-                ts_utc=to_utc(datetime.combine(meeting, FOMC_ANNOUNCEMENT_ET), assume_tz=EASTERN),
+                ts_utc=fomc_announcement_utc(meeting),
                 forecast=forecast,
                 actual=actual,
                 surprise=compute_surprise(forecast, actual),
@@ -50,8 +55,8 @@ def build_fomc_events(
 def fetch_fomc_events(
     api_key: str, *, forecasts: Mapping[date, float] | None = None
 ) -> list[Event]:
-    dates = _fetch_fomc_dates(api_key)
-    rate_by_date = _fetch_target_rate(api_key)
+    dates = fetch_fomc_dates(api_key)
+    rate_by_date = fetch_target_rate(api_key)
     return build_fomc_events(dates, rate_by_date, forecasts)
 
 
@@ -62,14 +67,14 @@ def load_fomc_events(session: Session, events: Iterable[Event]) -> int:
     return len(events)
 
 
-def _fetch_fomc_dates(api_key: str) -> list[date]:
+def fetch_fomc_dates(api_key: str) -> list[date]:
     params = {"release_id": FOMC_RELEASE_ID, "api_key": api_key, "file_type": "json"}
     resp = requests.get(f"{FRED_BASE}/release/dates", params=params, timeout=30)
     resp.raise_for_status()
     return [date.fromisoformat(row["date"]) for row in resp.json()["release_dates"]]
 
 
-def _fetch_target_rate(api_key: str) -> dict[date, float]:
+def fetch_target_rate(api_key: str) -> dict[date, float]:
     params = {"series_id": TARGET_RATE_SERIES, "api_key": api_key, "file_type": "json"}
     resp = requests.get(f"{FRED_BASE}/series/observations", params=params, timeout=30)
     resp.raise_for_status()
