@@ -18,6 +18,7 @@ class Paths(BaseModel):
 
 class Secrets(BaseSettings):
     database_url: str = "sqlite:///data/market_lens.db"
+    qdrant_url: str = "http://localhost:6333"
     fred_api_key: str = ""
     groq_api_key: str = ""
     gemini_api_key: str = ""
