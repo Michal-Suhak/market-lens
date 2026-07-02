@@ -6,6 +6,7 @@ from pathlib import Path
 
 from sqlalchemy.orm import Session
 
+from market_lens.collectors.download import download_histdata_m1
 from market_lens.storage import Price
 from market_lens.utils import parse_utc
 
@@ -39,3 +40,19 @@ def load_histdata_m1(
     session.add_all(bars)
     session.commit()
     return len(bars)
+
+
+def import_histdata_m1(
+    session: Session,
+    pair: str,
+    year: int | str,
+    *,
+    month: int | str | None = None,
+    dest_dir: str | Path = "data/prices",
+    source_tz: tzinfo = HISTDATA_TZ,
+) -> int:
+    """Download a HistData M1 CSV for a pair and load its bars into the prices table."""
+    csv_path = download_histdata_m1(
+        pair.replace("/", "").lower(), year, month=month, dest_dir=dest_dir
+    )
+    return load_histdata_m1(session, csv_path, pair, source_tz=source_tz)
