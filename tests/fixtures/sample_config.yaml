@@ -1,0 +1,11 @@
+pairs:
+  - EUR/USD
+  - GBP/USD
+windows_hours:
+  - 1
+  - 4
+  - 24
+paths:
+  data_dir: data
+  prices_dir: data/prices
+  documents_dir: data/documents

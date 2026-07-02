@@ -12,7 +12,8 @@ information than the bare numeric surprise or a coin flip?
 
 ## Status
 
-Early stage — project skeleton only. No data pipeline or prediction logic yet.
+Early stage — the data layer (events, documents, prices) is in place; the prediction and
+measurement layers are not built yet.
 
 ## Getting started
 
@@ -29,6 +30,11 @@ Lint / format:
 uv run ruff check .
 uv run black --check .
 ```
+
+## Data
+
+See [docs/data-layer.md](docs/data-layer.md) for how to fetch source data (FX prices, FOMC events,
+FED statements) and load it into the database.
 
 ## Project layout
 

@@ -4,7 +4,13 @@ version = "0.1.0"
 description = "Measurement instrument for LLM-based macro-event signal vs. FX price reaction"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "histdata>=1.1",
+    "pydantic-settings>=2.14.2",
+    "pyyaml>=6.0.3",
+    "requests>=2.34.2",
+    "sqlalchemy>=2.0.51",
+]
 
 [build-system]
 requires = ["uv_build>=0.8.22,<0.9"]
@@ -28,3 +34,4 @@ target-version = ["py313"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--import-mode=importlib"
