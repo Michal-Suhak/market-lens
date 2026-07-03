@@ -11,7 +11,7 @@ class _FlakyClient(LLMClient):
         self._response = response
         self.calls = 0
 
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
+    def complete(self, prompt: str) -> str:
         self.calls += 1
         if self.calls <= self._fail_times:
             raise RateLimitError("429")
@@ -21,10 +21,10 @@ class _FlakyClient(LLMClient):
 class _RecordingClient(LLMClient):
     def __init__(self, response: str = "ok"):
         self._response = response
-        self.received: list[tuple[str, float]] = []
+        self.received: list[str] = []
 
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
-        self.received.append((prompt, temperature))
+    def complete(self, prompt: str) -> str:
+        self.received.append(prompt)
         return self._response
 
 
@@ -32,7 +32,7 @@ class _AuthErrorClient(LLMClient):
     def __init__(self):
         self.calls = 0
 
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
+    def complete(self, prompt: str) -> str:
         self.calls += 1
         raise ValueError("bad credentials")
 
@@ -60,13 +60,13 @@ def test_returns_inner_value_after_retry():
     assert client.complete("p") == "hawkish"
 
 
-def test_forwards_prompt_and_temperature_to_inner():
+def test_forwards_prompt_to_inner():
     inner = _RecordingClient()
     client = RetryingLLMClient(inner, wait=wait_none())
 
-    client.complete("read the statement", temperature=0.3)
+    client.complete("read the statement")
 
-    assert inner.received == [("read the statement", 0.3)]
+    assert inner.received == ["read the statement"]
 
 
 def test_succeeds_on_the_last_allowed_attempt():

@@ -42,8 +42,8 @@ class SqlLlmCache:
         self._session.commit()
 
 
-def cache_key(prompt: str, temperature: float) -> str:
-    return hashlib.sha256(f"{temperature}\n{prompt}".encode()).hexdigest()
+def cache_key(prompt: str) -> str:
+    return hashlib.sha256(prompt.encode()).hexdigest()
 
 
 class CachingLLMClient(LLMClient):
@@ -51,11 +51,11 @@ class CachingLLMClient(LLMClient):
         self._inner = inner
         self._cache = cache
 
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
-        key = cache_key(prompt, temperature)
+    def complete(self, prompt: str) -> str:
+        key = cache_key(prompt)
         cached = self._cache.get(key)
         if cached is not None:
             return cached
-        value = self._inner.complete(prompt, temperature=temperature)
+        value = self._inner.complete(prompt)
         self._cache.set(key, value)
         return value

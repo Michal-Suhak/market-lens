@@ -14,9 +14,9 @@ class RateLimitError(Exception):
 
 class LLMClient(ABC):
     @abstractmethod
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
+    def complete(self, prompt: str) -> str:
         """Return the model's raw text response for a prompt."""
 
-    def structured(self, prompt: str, schema: type[T], *, temperature: float = 0.0) -> T:
+    def structured(self, prompt: str, schema: type[T]) -> T:
         """Parse and validate the model's JSON response into an instance of schema."""
-        return schema.model_validate_json(self.complete(prompt, temperature=temperature))
+        return schema.model_validate_json(self.complete(prompt))

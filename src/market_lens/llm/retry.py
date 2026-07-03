@@ -23,5 +23,5 @@ class RetryingLLMClient(LLMClient):
             reraise=True,
         )
 
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
-        return self._retrying(self._inner.complete, prompt, temperature=temperature)
+    def complete(self, prompt: str) -> str:
+        return self._retrying(self._inner.complete, prompt)

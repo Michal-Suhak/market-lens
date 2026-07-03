@@ -19,3 +19,7 @@ paths:
   data_dir: data
   prices_dir: data/prices
   documents_dir: data/documents
+
+# LLM provider used for predictions: groq, gemini or openai (keys in .env).
+llm_provider: groq
+llm_temperature: 0.0

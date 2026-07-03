@@ -13,7 +13,7 @@ class _StubClient(LLMClient):
     def __init__(self, response: str):
         self._response = response
 
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
+    def complete(self, prompt: str) -> str:
         return self._response
 
 

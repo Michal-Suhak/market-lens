@@ -7,7 +7,7 @@ class _CountingClient(LLMClient):
         self._response = response
         self.calls = 0
 
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
+    def complete(self, prompt: str) -> str:
         self.calls += 1
         return self._response
 
@@ -16,7 +16,7 @@ class _SequenceClient(LLMClient):
     def __init__(self):
         self.calls = 0
 
-    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
+    def complete(self, prompt: str) -> str:
         self.calls += 1
         return f"response-{self.calls}"
 
@@ -50,16 +50,6 @@ def test_different_prompt_is_a_cache_miss():
 
     client.complete("a")
     client.complete("b")
-
-    assert inner.calls == 2
-
-
-def test_different_temperature_is_a_cache_miss():
-    inner = _CountingClient("x")
-    client = CachingLLMClient(inner, InMemoryLlmCache())
-
-    client.complete("p", temperature=0.0)
-    client.complete("p", temperature=0.7)
 
     assert inner.calls == 2
 
@@ -110,10 +100,9 @@ def test_sql_cache_get_set_and_overwrite(db_session):
     assert cache.get("k") == "v2"
 
 
-def test_cache_key_is_stable_for_same_input():
-    assert cache_key("prompt", 0.0) == cache_key("prompt", 0.0)
+def test_cache_key_is_stable_for_same_prompt():
+    assert cache_key("prompt") == cache_key("prompt")
 
 
-def test_cache_key_differs_for_prompt_and_temperature():
-    assert cache_key("a", 0.0) != cache_key("b", 0.0)
-    assert cache_key("a", 0.0) != cache_key("a", 0.5)
+def test_cache_key_differs_for_different_prompt():
+    assert cache_key("a") != cache_key("b")
