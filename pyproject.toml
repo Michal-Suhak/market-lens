@@ -5,9 +5,11 @@ description = "Measurement instrument for LLM-based macro-event signal vs. FX pr
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "fastembed>=0.8.0",
     "histdata>=1.1",
     "pydantic-settings>=2.14.2",
     "pyyaml>=6.0.3",
+    "qdrant-client>=1.18.0",
     "requests>=2.34.2",
     "sqlalchemy>=2.0.51",
 ]
