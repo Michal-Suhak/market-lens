@@ -8,6 +8,10 @@ from pydantic import BaseModel
 T = TypeVar("T", bound=BaseModel)
 
 
+class RateLimitError(Exception):
+    """Raised by a provider when the API reports rate limiting (HTTP 429)."""
+
+
 class LLMClient(ABC):
     @abstractmethod
     def complete(self, prompt: str, *, temperature: float = 0.0) -> str:

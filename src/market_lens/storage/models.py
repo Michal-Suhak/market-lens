@@ -88,3 +88,12 @@ class Outcome(Base):
     realized_direction: Mapped[str | None]
 
     event: Mapped[Event] = relationship()
+
+
+class LlmCacheEntry(Base):
+    """A cached LLM response keyed by a hash of the request."""
+
+    __tablename__ = "llm_cache"
+
+    key: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[str] = mapped_column(Text)
