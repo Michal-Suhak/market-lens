@@ -3,8 +3,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from qdrant_client import QdrantClient
 from sqlalchemy.orm import Session
 
+from market_lens.rag.embedder import Embedder
 from market_lens.storage import (
     Document,
     Event,
@@ -16,6 +18,16 @@ from market_lens.storage import (
 )
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+
+@pytest.fixture
+def qdrant_client() -> QdrantClient:
+    return QdrantClient(":memory:")
+
+
+@pytest.fixture(scope="session")
+def embedder() -> Embedder:
+    return Embedder()
 
 
 @pytest.fixture
