@@ -1,0 +1,18 @@
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from typing import TypeVar
+
+from pydantic import BaseModel
+
+T = TypeVar("T", bound=BaseModel)
+
+
+class LLMClient(ABC):
+    @abstractmethod
+    def complete(self, prompt: str, *, temperature: float = 0.0) -> str:
+        """Return the model's raw text response for a prompt."""
+
+    def structured(self, prompt: str, schema: type[T], *, temperature: float = 0.0) -> T:
+        """Parse and validate the model's JSON response into an instance of schema."""
+        return schema.model_validate_json(self.complete(prompt, temperature=temperature))
