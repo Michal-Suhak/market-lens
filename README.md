@@ -34,7 +34,8 @@ uv run black --check .
 ## Data
 
 See [docs/data-layer.md](docs/data-layer.md) for how to fetch source data (FX prices, FOMC events,
-FED statements) and load it into the database.
+FED statements) and load it into the database, and [docs/rag-index.md](docs/rag-index.md) for
+building the RAG index.
 
 ## Project layout
 
