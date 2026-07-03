@@ -4,6 +4,8 @@ import uuid
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from market_lens.rag.chunking import chunk_document
 from market_lens.rag.embedder import Embedder
@@ -47,3 +49,18 @@ def index_document(
     ]
     client.upsert(collection_name=collection_name, points=points)
     return len(points)
+
+
+def index_all_documents(
+    client: QdrantClient,
+    embedder: Embedder,
+    session: Session,
+    *,
+    collection_name: str = COLLECTION_NAME,
+) -> int:
+    """Index every stored document into Qdrant; returns the total number of points written."""
+    ensure_collection(client, collection_name)
+    total = 0
+    for document in session.scalars(select(Document)):
+        total += index_document(client, embedder, document, collection_name=collection_name)
+    return total

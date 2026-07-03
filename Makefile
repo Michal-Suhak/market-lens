@@ -1,4 +1,4 @@
-.PHONY: init-db test lint format import-prices seed-fomc fetch-statements compute-outcomes
+.PHONY: init-db test lint format import-prices seed-fomc fetch-statements compute-outcomes build-rag-index
 
 PAIR ?= EUR/USD
 YEAR ?= 2025
@@ -27,3 +27,6 @@ fetch-statements:
 
 compute-outcomes:
 	uv run python -c "from market_lens.config import load_config; from market_lens.storage import get_sessionmaker; from market_lens.outcomes.compute import compute_all_outcomes; cfg=load_config(); s=get_sessionmaker()(); print('computed', compute_all_outcomes(s, cfg.pairs), 'outcomes')"
+
+build-rag-index:
+	uv run python -c "from market_lens.storage import get_sessionmaker; from market_lens.rag.qdrant import get_client; from market_lens.rag.embedder import Embedder; from market_lens.rag.indexing import index_all_documents; s=get_sessionmaker()(); print('indexed', index_all_documents(get_client(), Embedder(), s), 'points')"

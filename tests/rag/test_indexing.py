@@ -1,8 +1,12 @@
+from datetime import datetime, timedelta, timezone
+
 from market_lens.rag.chunking import chunk_document
-from market_lens.rag.indexing import index_document
+from market_lens.rag.indexing import index_all_documents, index_document
 from market_lens.rag.qdrant import COLLECTION_NAME
 
+UTC = timezone.utc
 LONG_TEXT = " ".join(f"word{i}" for i in range(500))
+MEDIUM_TEXT = " ".join(f"word{i}" for i in range(250))
 
 
 def test_index_document_writes_one_point_per_chunk(
@@ -45,3 +49,26 @@ def test_index_document_attaches_metadata(qdrant_client, embedder, db_session, m
     assert payload["doc_type"] == "FOMC"
     assert payload["doc_id"] == doc.id
     assert "date" in payload
+
+
+def test_index_all_documents_covers_every_document(
+    qdrant_client, embedder, db_session, make_document
+):
+    t0 = datetime(2026, 1, 28, 19, 0, tzinfo=UTC)
+    docs = [
+        make_document(institution="FED", doc_type="FOMC", published_ts_utc=t0, text=MEDIUM_TEXT),
+        make_document(
+            institution="ECB",
+            doc_type="PRESS",
+            published_ts_utc=t0 - timedelta(days=1),
+            text=MEDIUM_TEXT,
+        ),
+    ]
+    db_session.add_all(docs)
+    db_session.commit()
+    expected = sum(len(chunk_document(doc)) for doc in docs)
+
+    total = index_all_documents(qdrant_client, embedder, db_session)
+
+    assert total == expected
+    assert qdrant_client.count(COLLECTION_NAME).count == expected
