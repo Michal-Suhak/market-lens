@@ -13,6 +13,10 @@ class RateLimitError(Exception):
 
 
 class LLMClient(ABC):
+    @property
+    def model(self) -> str:
+        return "unknown"
+
     @abstractmethod
     def complete(self, prompt: str) -> str:
         """Return the model's raw text response for a prompt."""

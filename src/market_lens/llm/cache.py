@@ -51,6 +51,10 @@ class CachingLLMClient(LLMClient):
         self._inner = inner
         self._cache = cache
 
+    @property
+    def model(self) -> str:
+        return self._inner.model
+
     def complete(self, prompt: str) -> str:
         key = cache_key(prompt)
         cached = self._cache.get(key)

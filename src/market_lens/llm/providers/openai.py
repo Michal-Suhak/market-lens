@@ -21,6 +21,10 @@ class OpenAIClient(LLMClient):
         self._temperature = temperature
         self._client = client if client is not None else OpenAI(api_key=api_key)
 
+    @property
+    def model(self) -> str:
+        return self._model
+
     def complete(self, prompt: str) -> str:
         try:
             response = self._client.chat.completions.create(

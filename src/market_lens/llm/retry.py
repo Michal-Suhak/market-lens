@@ -23,5 +23,9 @@ class RetryingLLMClient(LLMClient):
             reraise=True,
         )
 
+    @property
+    def model(self) -> str:
+        return self._inner.model
+
     def complete(self, prompt: str) -> str:
         return self._retrying(self._inner.complete, prompt)
