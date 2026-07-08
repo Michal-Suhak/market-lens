@@ -13,6 +13,28 @@ from market_lens.replay.documents import available_documents
 from market_lens.storage import Document, Event, Prediction
 
 
+def predict_all_events(
+    session: Session,
+    qdrant_client: QdrantClient,
+    embedder: Embedder,
+    llm: LLMClient,
+    *,
+    pair: str,
+    top_k: int = 5,
+) -> int:
+    """Predict every event without a prediction for this model yet; return the number written."""
+    predicted = set(
+        session.scalars(select(Prediction.event_id).where(Prediction.model == llm.model))
+    )
+    count = 0
+    for event in session.scalars(select(Event)).all():
+        if event.id in predicted:
+            continue
+        predict_event(session, qdrant_client, embedder, llm, event, pair=pair, top_k=top_k)
+        count += 1
+    return count
+
+
 def predict_event(
     session: Session,
     qdrant_client: QdrantClient,
