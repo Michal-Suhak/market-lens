@@ -12,8 +12,9 @@ information than the bare numeric surprise or a coin flip?
 
 ## Status
 
-Early stage — the data layer (events, documents, prices) is in place; the prediction and
-measurement layers are not built yet.
+The data layer (events, documents, prices), the RAG index, the LLM prediction pipeline and the
+measurement layer (accuracy, IC, calibration, event study, lift) are in place. See
+[docs/metrics.md](docs/metrics.md) for how to read the results.
 
 ## Getting started
 
@@ -35,7 +36,8 @@ uv run black --check .
 
 See [docs/data-layer.md](docs/data-layer.md) for how to fetch source data (FX prices, FOMC events,
 FED statements) and load it into the database, and [docs/rag-index.md](docs/rag-index.md) for
-building the RAG index.
+building the RAG index. Once predictions and outcomes exist, [docs/metrics.md](docs/metrics.md)
+covers generating and reading the measurement report.
 
 ## Project layout
 
