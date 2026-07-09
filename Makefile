@@ -1,4 +1,4 @@
-.PHONY: init-db test lint format import-prices seed-fomc fetch-statements compute-outcomes build-rag-index predict
+.PHONY: init-db test lint format import-prices seed-fomc fetch-statements compute-outcomes build-rag-index predict report
 
 PAIR ?= EUR/USD
 YEAR ?= 2025
@@ -33,3 +33,6 @@ build-rag-index:
 
 predict:
 	uv run python -c "from market_lens.config import load_config; from market_lens.storage import get_sessionmaker; from market_lens.llm.factory import make_llm_client; from market_lens.llm.cache import CachingLLMClient, SqlLlmCache; from market_lens.llm.retry import RetryingLLMClient; from market_lens.rag.qdrant import get_client; from market_lens.rag.embedder import Embedder; from market_lens.prediction.pipeline import predict_all_events; cfg=load_config(); s=get_sessionmaker()(); llm=CachingLLMClient(RetryingLLMClient(make_llm_client(cfg)), SqlLlmCache(s)); print('predicted', predict_all_events(s, get_client(), Embedder(), llm, pair=cfg.pairs[0]), 'events')"
+
+report:
+	uv run python -c "from market_lens.config import load_config; from market_lens.storage import get_sessionmaker; from market_lens.measurement.report import build_report, write_json, write_frame_csv; cfg=load_config(); s=get_sessionmaker()(); pair=cfg.pairs[0]; write_json(build_report(s, pair=pair), 'report.json'); write_frame_csv(s, 'report_frame.csv', pair=pair); print('wrote report.json and report_frame.csv for', pair)"
